@@ -9,7 +9,7 @@ const cors       = require('cors');
 const fs         = require('fs');
 const path       = require('path');
 const pdfParse   = require('pdf-parse');
-const bcrypt     = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt        = require('jsonwebtoken');
 const Database   = require('better-sqlite3');
 
