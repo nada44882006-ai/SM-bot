@@ -2,9 +2,7 @@
    SMBOT — script.js (Redesigned)
 ═══════════════════════════════════════════════ */
 
-const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:3000/api'
-  : '/api';
+const API = 'https://owlyy-production.up.railway.app/api';
 
 let currentSessionId      = null;
 let chatSessions          = [];
@@ -177,84 +175,6 @@ function toggleEye(inputId, btn) {
   if (!inp) return;
   inp.type = inp.type === 'password' ? 'text' : 'password';
   btn.textContent = inp.type === 'password' ? '👁' : '🙈';
-}
-
-/* ─────────────── FORGOT PASSWORD ─────────────── */
-function showForgotPassword() {
-  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-  const form = document.getElementById('form-forgot');
-  if (form) form.classList.add('active');
-  // Hide tab indicator
-  const indicator = document.getElementById('tabIndicator');
-  if (indicator) indicator.style.opacity = '0';
-}
-
-function backToSignIn() {
-  const indicator = document.getElementById('tabIndicator');
-  if (indicator) indicator.style.opacity = '1';
-  switchTab('signin');
-}
-
-async function doForgotPassword() {
-  const email = (document.getElementById('fpEmail')?.value || '').trim();
-  if (!email) { shakeCard('.auth-card'); showToast('⚠️ Enter your email'); return; }
-
-  const btn = document.getElementById('forgotBtn');
-  if (!btn) return;
-  btn.textContent = 'Sending…'; btn.disabled = true;
-
-  try {
-    const res  = await fetch(`${API}/auth/forgot-password`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-    const data = await res.json();
-    if (!res.ok) { showToast('❌ ' + (data.error || 'Error')); }
-    else {
-      showToast('📧 Reset code sent to your email!');
-      // Show reset form
-      document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-      const rf = document.getElementById('form-reset');
-      if (rf) {
-        rf.classList.add('active');
-        const emailHidden = document.getElementById('resetEmail');
-        if (emailHidden) emailHidden.value = email;
-      }
-    }
-  } catch(e) { showToast('❌ Connection error'); }
-  finally   { btn.textContent = 'Send Reset Code'; btn.disabled = false; }
-}
-
-async function doResetPassword() {
-  const email    = (document.getElementById('resetEmail')?.value    || '').trim();
-  const code     = (document.getElementById('resetCode')?.value     || '').trim();
-  const password = (document.getElementById('resetPassword')?.value || '');
-  const confirm  = (document.getElementById('resetConfirm')?.value  || '');
-
-  if (!code)     { shakeCard('.auth-card'); showToast('⚠️ Enter the reset code'); return; }
-  if (!password) { shakeCard('.auth-card'); showToast('⚠️ Enter new password'); return; }
-  if (password.length < 6) { shakeCard('.auth-card'); showToast('⚠️ Password min 6 characters'); return; }
-  if (password !== confirm) { shakeCard('.auth-card'); showToast('⚠️ Passwords do not match'); return; }
-
-  const btn = document.getElementById('resetBtn');
-  if (!btn) return;
-  btn.textContent = 'Resetting…'; btn.disabled = true;
-
-  try {
-    const res  = await fetch(`${API}/auth/reset-password`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, code, password })
-    });
-    const data = await res.json();
-    if (!res.ok) { showToast('❌ ' + (data.error || 'Error')); }
-    else {
-      showToast('✅ Password reset! Please sign in.');
-      setTimeout(() => { const indicator = document.getElementById('tabIndicator'); if (indicator) indicator.style.opacity = '1'; switchTab('signin'); }, 1500);
-    }
-  } catch(e) { showToast('❌ Connection error'); }
-  finally   { btn.textContent = 'Set New Password'; btn.disabled = false; }
 }
 
 /* ─────────────── SIGN IN ─────────────── */
