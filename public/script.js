@@ -2,7 +2,7 @@
    SMBOT — script.js (Redesigned)
 ═══════════════════════════════════════════════ */
 
-const API = 'https://owlyy-production.up.railway.app/api';
+const API = window.location.origin + '/api';
 
 let currentSessionId      = null;
 let chatSessions          = [];
@@ -810,6 +810,11 @@ function pick(i, btn) {
 function nextQ() {
   qIdx++;
   if (qIdx >= quizAllQ.length) showResult(); else renderQ();
+}
+
+function submitQuiz() {
+  // Jump straight to results, scoring remaining questions as unanswered
+  showResult();
 }
 
 function showResult() {

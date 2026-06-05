@@ -495,7 +495,7 @@ app.post('/api/chat', authMiddleware, async (req, res) => {
   try {
     const { answer } = await smartAnswer(question, session, level || 'normal');
     res.json({ answer });
-  } catch(e) { res.json({ answer: 'حصل خطأ، حاول تاني.' }); }
+  } catch(e) { res.json({ answer: session.lang === 'ar' ? 'حصل خطأ، حاول تاني.' : 'An error occurred, please try again.' }); }
 });
 
 // ── Upload Endpoint ─────────────────────────────
@@ -550,8 +550,12 @@ app.post('/api/quiz', authMiddleware, async (req, res) => {
     const diff = difficulty || 'medium';
     const context = session.chunks.slice(0,8).join('\n\n');
     const diffInstructions = { easy: 'Make questions simple. Test basic definitions and facts.', medium: 'Make questions moderately challenging. Test understanding.', hard: 'Make questions difficult. Test analysis and critical thinking.' };
-    const prompt = `You are a quiz generator. Create a quiz from the lecture content.\nDifficulty: ${diff.toUpperCase()} - ${diffInstructions[diff]}\n\nLecture:\n"""\n${context}\n"""\n\nGenerate EXACTLY this JSON (no extra text):\n{\n  "mcq": [\n    {"q": "Full question?", "opts": ["Complete answer one", "Complete answer two", "Complete answer three", "Complete answer four"], "ans": 0},\n    {"q": "Full question?", "opts": ["Complete answer one", "Complete answer two", "Complete answer three", "Complete answer four"], "ans": 1},\n    {"q": "Full question?", "opts": ["Complete answer one", "Complete answer two", "Complete answer three", "Complete answer four"], "ans": 2},\n    {"q": "Full question?", "opts": ["Complete answer one", "Complete answer two", "Complete answer three", "Complete answer four"], "ans": 3},\n    {"q": "Full question?", "opts": ["Complete answer one", "Complete answer two", "Complete answer three", "Complete answer four"], "ans": 0}\n  ],\n  "tf": [\n    {"q": "A complete statement.", "ans": true},\n    {"q": "A complete statement.", "ans": false},\n    {"q": "A complete statement.", "ans": true},\n    {"q": "A complete statement.", "ans": false}\n  ]\n}\nRULES: opts must be REAL complete phrases NOT letters like A/B/C/D. Return ONLY JSON.`;
-    const raw = await askGroq('Return only valid JSON.', prompt);
+    const isAr = session.lang === 'ar';
+    const langRule = isAr
+      ? 'IMPORTANT: Write ALL questions, options, and statements in Arabic only.'
+      : 'IMPORTANT: Write ALL questions, options, and statements in English only.';
+    const prompt = `You are a quiz generator. Create a quiz from the lecture content.\nDifficulty: ${diff.toUpperCase()} - ${diffInstructions[diff]}\n${langRule}\n\nLecture:\n"""\n${context}\n"""\n\nGenerate EXACTLY this JSON (no extra text):\n{\n  "mcq": [\n    {"q": "Full question?", "opts": ["Complete answer one", "Complete answer two", "Complete answer three", "Complete answer four"], "ans": 0},\n    {"q": "Full question?", "opts": ["Complete answer one", "Complete answer two", "Complete answer three", "Complete answer four"], "ans": 1},\n    {"q": "Full question?", "opts": ["Complete answer one", "Complete answer two", "Complete answer three", "Complete answer four"], "ans": 2},\n    {"q": "Full question?", "opts": ["Complete answer one", "Complete answer two", "Complete answer three", "Complete answer four"], "ans": 3},\n    {"q": "Full question?", "opts": ["Complete answer one", "Complete answer two", "Complete answer three", "Complete answer four"], "ans": 0}\n  ],\n  "tf": [\n    {"q": "A complete statement.", "ans": true},\n    {"q": "A complete statement.", "ans": false},\n    {"q": "A complete statement.", "ans": true},\n    {"q": "A complete statement.", "ans": false}\n  ]\n}\nRULES: opts must be REAL complete phrases NOT letters like A/B/C/D. Return ONLY JSON.`;
+    const raw = await askGroq(`Return only valid JSON. ${isAr ? 'All text must be in Arabic.' : 'All text must be in English.'}`, prompt);
     if (raw) {
       try {
         const clean = raw.replace(/```json|```/g,'').trim();
