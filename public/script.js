@@ -2,7 +2,7 @@
    SMBOT — script.js (Redesigned)
 ═══════════════════════════════════════════════ */
 
-const API = 'https://owlyy-production.up.railway.app/api';
+const API = 'https://smbot-production-996e.up.railway.app/api';
 
 let currentSessionId      = null;
 let chatSessions          = [];
