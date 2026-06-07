@@ -2,7 +2,7 @@
    SMBOT — script.js (Redesigned)
 ═══════════════════════════════════════════════ */
 
-const API = window.location.origin + '/api';
+const API = 'https://owlyy-production.up.railway.app/api';
 
 let currentSessionId      = null;
 let chatSessions          = [];
@@ -812,11 +812,6 @@ function nextQ() {
   if (qIdx >= quizAllQ.length) showResult(); else renderQ();
 }
 
-function submitQuiz() {
-  // Jump straight to results, scoring remaining questions as unanswered
-  showResult();
-}
-
 function showResult() {
   const qg = document.getElementById('quizGame');
   const qr = document.getElementById('quizResult');
@@ -1008,4 +1003,8 @@ function _showAutoQuestions() {
     list.appendChild(btn);
   });
   panel.style.display = 'block';
+}
+function submitQuiz() {
+  // Jump straight to results, scoring remaining questions as unanswered
+  showResult();
 }
